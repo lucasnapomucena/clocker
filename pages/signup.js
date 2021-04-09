@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import axios from "axios";
 
 import {
   Container,
@@ -44,7 +45,16 @@ export default function Home() {
           .auth()
           .createUserWithEmailAndPassword(values.email, values.password);
 
-        console.log(user);
+        const { data } = await axios({
+          method: "post",
+          url: "/api/profile",
+          data: {
+            username: values.username,
+          },
+          header: {
+            Authentication: `Bearer ${user.getToken()}`,
+          },
+        });
       } catch (error) {
         console.error(error);
       }
