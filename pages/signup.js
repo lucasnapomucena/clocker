@@ -17,7 +17,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Logo } from "../components";
-import { firebaseClient } from "../config/firebase";
+import { firebaseClient } from "../config/firebase/client";
 
 const validationSchema = yup.object().shape({
   email: yup
