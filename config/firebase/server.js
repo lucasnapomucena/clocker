@@ -1,8 +1,8 @@
-import admin from "firebase-admin";
+import firebaseServer from "firebase-admin";
 
-const app = firebase.apps.length
-  ? firebase.app()
-  : firebase.initializeApp({
+const app = firebaseServer.apps.length
+  ? firebaseServer.app()
+  : firebaseServer.initializeApp({
       credential: admin.credential.cert({
         type: "service_account",
         project_id: "clocker-lucas",
@@ -21,4 +21,4 @@ const app = firebase.apps.length
       }),
     });
 
-export default admin;
+export { firebaseServer };

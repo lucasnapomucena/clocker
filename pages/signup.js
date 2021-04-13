@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import axios from "axios";
 
 import {
   Container,
@@ -17,8 +18,7 @@ import {
   InputRightAddon,
 } from "@chakra-ui/react";
 
-import { Logo } from "../components";
-import { firebaseClient } from "../config/firebase/client";
+import { Logo, useAuth } from "../components";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -30,6 +30,9 @@ const validationSchema = yup.object().shape({
 });
 
 export default function Home() {
+  const [auth, { signup }] = useAuth();
+  const router = useRouter();
+
   const {
     values,
     errors,
@@ -39,26 +42,7 @@ export default function Home() {
     handleSubmit,
     isSubmitting,
   } = useFormik({
-    onSubmit: async (values, form) => {
-      try {
-        const user = await firebaseClient
-          .auth()
-          .createUserWithEmailAndPassword(values.email, values.password);
-
-        const { data } = await axios({
-          method: "post",
-          url: "/api/profile",
-          data: {
-            username: values.username,
-          },
-          header: {
-            Authentication: `Bearer ${user.getToken()}`,
-          },
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    },
+    onSubmit: signup,
     validationSchema,
     initialValues: {
       email: "",
@@ -66,6 +50,10 @@ export default function Home() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    auth.user && router.push("/agenda");
+  }, [auth.user]);
 
   return (
     <Container p={4} centerContent>
