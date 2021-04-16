@@ -5,12 +5,15 @@ import axios from "axios";
 import { addDays, subDays } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Container, Button, Box, IconButton } from "@chakra-ui/react";
+import { getToken } from "../config/firebase/client";
 import { useAuth, Logo, formatDate } from "./../components";
 
-const getAgenda = ({ token, when }) => {
-  axios({
+const getAgenda = async (when = when) => {
+  const token = await getToken();
+
+  return axios({
     method: "get",
-    url: "/api/agenda/",
+    url: "/api/agenda",
     params: { when },
     headers: {
       Authorization: `Bearer ${token}`,
