@@ -13,6 +13,7 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 import { Input } from "../Input";
+import { formatWithValidation } from "next/dist/next-server/lib/utils";
 
 const setSchedule = async (data) =>
   axios({
@@ -24,7 +25,13 @@ const setSchedule = async (data) =>
     },
   });
 
-const ModalTimeBlock = ({ isOpen, onClose, onComplete, children }) => {
+const ModalTimeBlock = ({
+  isOpen,
+  onClose,
+  onComplete,
+  isSubmitting,
+  children,
+}) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -34,10 +41,17 @@ const ModalTimeBlock = ({ isOpen, onClose, onComplete, children }) => {
         <ModalBody>{children}</ModalBody>
 
         <ModalFooter>
-          <Button variant="ghost" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button colorScheme="blue" mr={3} onClick={onComplete}>
+          {!isSubmitting && (
+            <Button variant="ghost" onClick={onClose}>
+              Cancelar
+            </Button>
+          )}
+          <Button
+            colorScheme="blue"
+            mr={3}
+            onClick={onComplete}
+            isLoading={isSubmitting}
+          >
             Reservar Horário
           </Button>
         </ModalFooter>
@@ -58,9 +72,15 @@ export const TimeBlock = ({ time }) => {
     handleBlur,
     errors,
     touched,
+    isSubmitting,
   } = useFormik({
-    onSubmit: (values) => {
-      setSchedule({ ...values, when: time });
+    onSubmit: async (values) => {
+      try {
+        await setSchedule({ ...values, when: time });
+        toggle();
+      } catch (error) {
+        console.log(error);
+      }
     },
     initialValues: {
       name: "",
@@ -80,6 +100,7 @@ export const TimeBlock = ({ time }) => {
         time={time}
         onClose={toggle}
         onComplete={handleSubmit}
+        isSubmitting={isSubmitting}
       >
         <>
           <Input
@@ -92,6 +113,7 @@ export const TimeBlock = ({ time }) => {
             size="lg"
             onChange={handleChange}
             onBlur={handleBlur}
+            disabled={isSubmitting}
           />
           <Input
             name="phone"
@@ -103,6 +125,7 @@ export const TimeBlock = ({ time }) => {
             mt={4}
             onChange={handleChange}
             onBlur={handleBlur}
+            disabled={isSubmitting}
           />
         </>
       </ModalTimeBlock>
