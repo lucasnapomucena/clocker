@@ -126,6 +126,7 @@ export const TimeBlock = ({ time, date, disabled }) => {
             <Input
               name="phone"
               label="Telefone:"
+              mask={["(99) 9999-9999", "(99) 9 9999-9999"]}
               error={errors.phone}
               value={values.phone}
               placeholder="(11) 9 9999-9999"

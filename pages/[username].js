@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useFetch } from "@refetty/react";
 import axios from "axios";
 import { addDays, subDays, format } from "date-fns";
-import { useFormik, yupToFormErrors } from "formik";
+import { useFormik } from "formik";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
   Container,
@@ -14,7 +14,6 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useAuth, Logo, formatDate, TimeBlock } from "../components";
-import { redirect } from "next/dist/next-server/server/api-utils";
 
 const getSchedule = async ({ when, username }) =>
   axios({
