@@ -2,9 +2,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useFetch } from "@refetty/react";
 import axios from "axios";
-import { addDays, subDays } from "date-fns";
+import { addDays, subDays, format } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { Container, Button, Box, IconButton } from "@chakra-ui/react";
+import {
+  Container,
+  Button,
+  Box,
+  IconButton,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { getToken } from "../config/firebase/client";
 import { useAuth, Logo, formatDate } from "./../components";
 
@@ -14,7 +21,7 @@ const getAgenda = async (when = when) => {
   return axios({
     method: "get",
     url: "/api/agenda",
-    params: { when },
+    params: { date: format(when, "yyyy-MM-dd") },
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -27,11 +34,28 @@ const Header = ({ children }) => (
   </Box>
 );
 
+const AgendaBlock = ({ time, name, phone, ...props }) => (
+  <Box
+    {...props}
+    display="flex"
+    alignItems="center"
+    bg="gray.100"
+    borderRadius={8}
+    p={4}
+  >
+    <Box flex={1}>{time}</Box>
+    <Box textAlign="right">
+      <Text fontSize="2xl">{name}</Text>
+      <Text fontSize="sm">{phone}</Text>
+    </Box>
+  </Box>
+);
+
 export default function Agenda() {
   const router = useRouter();
   const [auth, { logout }] = useAuth();
   const [when, setWhen] = useState(() => new Date());
-  const [data, { loading, status, error }, fetch] = useFetch(getAgenda, {
+  const [data, { loading }, fetch] = useFetch(getAgenda, {
     lazy: true,
   });
 
@@ -67,6 +91,26 @@ export default function Agenda() {
           onClick={addDay}
         />
       </Box>
+
+      {loading && (
+        <Spinner
+          thickness="4px"
+          speed="0.65s"
+          emptyColor="gray.200"
+          color="blue.500"
+          size="xl"
+        />
+      )}
+
+      {data?.map((doc) => (
+        <AgendaBlock
+          key={doc.time}
+          time={doc.time}
+          name={doc.name}
+          phone={doc.phone}
+          mt={4}
+        />
+      ))}
     </Container>
   );
 }
