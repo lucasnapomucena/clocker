@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import axios from "axios";
 import {
   Button,
   Modal,
@@ -12,6 +13,16 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 import { Input } from "../Input";
+
+const setSchedule = async (data) =>
+  axios({
+    method: "post",
+    url: "/api/schedule",
+    data: {
+      ...data,
+      username: window.location.pathname.replace("/", ""),
+    },
+  });
 
 const ModalTimeBlock = ({ isOpen, onClose, onComplete, children }) => {
   return (
@@ -48,7 +59,9 @@ export const TimeBlock = ({ time }) => {
     errors,
     touched,
   } = useFormik({
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      setSchedule({ ...values, when: time });
+    },
     initialValues: {
       name: "",
       phone: "",
